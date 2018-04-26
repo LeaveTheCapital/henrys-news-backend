@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha spec/",
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "nodemon listen.js",
     "seed:dev": "node seed/dev.seed.js"
   },
   "author": "",
