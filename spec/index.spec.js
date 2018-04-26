@@ -26,7 +26,7 @@ describe("/api", () => {
     });
   });
   after(() => mongoose.disconnect());
-  describe.only("/topics", () => {
+  describe("/topics", () => {
     it("get /topics returns a 200 and 2 topics", () => {
       return request
         .get("/api/topics")
@@ -54,7 +54,6 @@ describe("/api", () => {
         })
         .expect(201)
         .then(({ body }) => {
-          console.log(body);
           expect(body.article.title).to.equal("test article");
           expect(body.article.body).to.equal(
             "this is the start of an extremely engaging test article"
@@ -68,22 +67,36 @@ describe("/api", () => {
         .get(`/api/users/${userDocs[0].username}`)
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
           expect(body.user.username).to.equal("butter_bridge");
         });
     });
   });
   describe("/articles", () => {
+    it("post /articles/:article_id/comments return a 201 and adds a comment to that article ", () => {
+      return request
+        .post(`/api/articles/${articleDocs[0]._id}/comments`)
+        .send({
+          body: "this is the start of an extremely engaging test comment",
+          belongs_to: articleDocs[0]._id,
+          created_by: userDocs[0]._id
+        })
+        .expect(201)
+        .then(({ body }) => {
+          console.log(body);
+          expect(body.comment.body).to.equal(
+            "this is the start of an extremely engaging test comment"
+          );
+        });
+    });
     it("get /articles returns a 200 and 4 articles", () => {
-      return (
-        request
-          .get("/api/articles")
-          // TODO: add comment count and check user populated
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.articles.length).to.equal(4);
-          })
-      );
+      return request
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.equal(4);
+          expect(body.articles[0].comment_count).to.equal(2);
+          expect(body.articles[0].votes).to.equal(0);
+        });
     });
     it("get /articles/:article_id returns a 200 and the article", () => {
       return request
@@ -100,22 +113,21 @@ describe("/api", () => {
         .get(`/api/articles/${articleDocs[0]._id}/comments`)
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
           expect(body.comments.length).to.equal(2);
         });
     });
-    it("PUT /api/articles/:article_id with a query of up returns a 201 and the vote is incremented", () => {
+    it("PUT /api/articles/:article_id with a query of up returns a 200 and the vote is incremented", () => {
       return request
         .put(`/api/articles/${articleDocs[0]._id}?vote=up`)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.article.votes).to.equal(1);
         });
     });
-    it("PUT /api/articles/:article_id with a query of down returns a 201 and the vote is decremented ", () => {
+    it("PUT /api/articles/:article_id with a query of down returns a 200 and the vote is decremented ", () => {
       return request
         .put(`/api/articles/${articleDocs[0]._id}?vote=down`)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.article.votes).to.equal(-1);
         });
@@ -123,36 +135,44 @@ describe("/api", () => {
     it("PUT /api/articles/:article_id with any other query leave the vote count alone", () => {
       return request
         .put(`/api/articles/${articleDocs[0]._id}?vote=asdf`)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.article.votes).to.equal(0);
         });
     });
   });
   describe("/comments", () => {
-    it("PUT /api/comments/:comment_id with a query of up returns a 201 and the vote is incremented", () => {
+    it("PUT /api/comments/:comment_id with a query of up returns a 200 and the vote is incremented", () => {
       return request
         .put(`/api/comments/${commentDocs[0]._id}?vote=up`)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
-          console.log(body);
           expect(body.comment.votes).to.equal(1);
         });
     });
-    it("PUT /api/comments/:comment_id with a query of down returns a 201 and the vote is decremented ", () => {
+    it("PUT /api/comments/:comment_id with a query of down returns a 200 and the vote is decremented ", () => {
       return request
         .put(`/api/comments/${commentDocs[0]._id}?vote=down`)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.comment.votes).to.equal(-1);
         });
     });
-    it("PUT /api/comments/:comment_id with any other query leave the vote count alone", () => {
+    it("PUT /api/comments/:comment_id with any other query leaves the vote count alone", () => {
       return request
         .put(`/api/comments/${commentDocs[0]._id}?vote=asdf`)
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.comment.votes).to.equal(0);
+        });
+    });
+    it("DELETE /api/comments/:comment_id returns a 200, the id and a confirmation", () => {
+      return request
+        .delete(`/api/comments/${commentDocs[0]._id}`)
+        .expect(200)
+        .then(({ body }) => {
+          console.log(body);
+          expect(body.message).to.equal("comment deleted");
         });
     });
   });

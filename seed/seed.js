@@ -39,7 +39,7 @@ function seedDB(
     })
     .then(([userIds, topicDocs, userDocs, articleDocs]) => {
       console.log(`inserted ${articleDocs.length} articles`);
-      const commentData = commentFunction(articleDocs, userIds);
+      const commentData = commentFunction(articleDocs, userIds, userDocs);
       return Promise.all([
         topicDocs,
         userDocs,
