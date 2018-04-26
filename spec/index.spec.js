@@ -54,6 +54,7 @@ describe("/api", () => {
         })
         .expect(201)
         .then(({ body }) => {
+          console.log(body);
           expect(body.article.title).to.equal("test article");
           expect(body.article.body).to.equal(
             "this is the start of an extremely engaging test article"
