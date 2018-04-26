@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { updateVoteCount } = require("../controllers/comments");
+const { updateCommentVoteCount } = require("../controllers/comments");
 
-router.get("/", updateVoteCount);
+router.put("/:comment_id", updateCommentVoteCount);
 
 module.exports = router;

@@ -12,3 +12,5 @@ exports.getArticlesByTopicId = (req, res, next) => {
     .then(articles => res.send({ articles }))
     .catch(err => next(err));
 };
+
+exports.addArticleByTopicID = (req, res, next) => {};

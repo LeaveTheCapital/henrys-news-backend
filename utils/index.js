@@ -22,11 +22,18 @@ exports.formatArticleData = (articleData, topicIds, userIds, orderFunction) => {
 };
 
 exports.createTestCommentData = (articleDocs, userIds) => {
-  return {
-    body: "this is a test comment. very dull indeed",
-    belongs_to: articleDocs[0]._id,
-    created_by: userIds.mitch
-  };
+  return [
+    {
+      body: "this is a test comment. very dull indeed",
+      belongs_to: articleDocs[0]._id,
+      created_by: userIds.mitch
+    },
+    {
+      body: "second test comment. Lorem ipsum etc",
+      belongs_to: articleDocs[0]._id,
+      created_by: userIds.jonny
+    }
+  ];
 };
 
 exports.testOrderFunction = (article, idRefObj, i) => {
