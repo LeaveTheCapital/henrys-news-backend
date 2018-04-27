@@ -7,7 +7,8 @@ function seedDB(
   articleData,
   userData,
   orderFunction,
-  commentFunction
+  commentFunction,
+  maxNumOfComments
 ) {
   return mongoose.connection
     .dropDatabase()
@@ -39,7 +40,12 @@ function seedDB(
     })
     .then(([userIds, topicDocs, userDocs, articleDocs]) => {
       console.log(`inserted ${articleDocs.length} articles`);
-      const commentData = commentFunction(articleDocs, userIds, userDocs);
+      const commentData = commentFunction(
+        articleDocs,
+        userIds,
+        userDocs,
+        maxNumOfComments
+      );
       return Promise.all([
         topicDocs,
         userDocs,

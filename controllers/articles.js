@@ -5,6 +5,7 @@ const { generateCount } = require("../utils");
 exports.getAllArticles = (req, res, next) => {
   Article.find()
     .populate({ path: "created_by", select: "username name avatar_url" })
+    .populate({ path: "belongs_to", select: "slug" })
     .then(articles => {
       const articleComments = generateCount(articles, Comment);
       return Promise.all([articles, ...articleComments]);
@@ -35,6 +36,7 @@ exports.getArticleById = (req, res, next) => {
 exports.getCommentsByArticleId = (req, res, next) => {
   const id = req.params.article_id;
   Comment.find({ belongs_to: id })
+    .populate("created_by", "-__v")
     .then(comments => res.send({ comments }))
     .catch(err => {
       return next(err);
@@ -45,18 +47,29 @@ exports.updateArticleVoteCount = (req, res, next) => {
   const id = req.params.article_id;
   const vote = req.query.vote;
   const swing = vote === "up" ? 1 : vote === "down" ? -1 : 0;
+  if (swing === 0) {
+    throw { status: 400, message: "invalid query. could not update votes" };
+  }
   Article.findByIdAndUpdate(id, { $inc: { votes: swing } }, { new: true })
-    .then(article => res.status(200).send({ article }))
-    .catch(err => next(err));
+    .then(article => res.send({ article }))
+    .catch(err => {
+      if (!err.status) err.status = 400;
+      if (!err.message) err.message = "could not update votes";
+      return next(err);
+    });
 };
 
 exports.addCommentByArticleId = (req, res, next) => {
   const id = req.params.article_id;
   new Comment(req.body)
     .save()
-    .then(comment => res.status(201).send({ comment }))
+    .then(comment =>
+      res.status(201).send({
+        comment: comment.body
+      })
+    )
     .catch(err => {
       console.log(err);
-      return next(err);
+      return next({ status: 400, message: "could not add comment" });
     });
 };

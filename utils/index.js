@@ -36,14 +36,19 @@ exports.createTestCommentData = (articleDocs, userIds) => {
   ];
 };
 
-exports.createRandomCommentData = (articleDocs, userIds, userDocs) => {
+exports.createRandomCommentData = (
+  articleDocs,
+  userIds,
+  userDocs,
+  maxNumOfComments
+) => {
   const commentsArr = [];
   articleDocs.forEach(article => {
-    const randomNumOfComments = Math.floor(Math.random() * 5);
+    const randomNumOfComments = Math.floor(Math.random() * maxNumOfComments);
     const randomUser = Math.floor(Math.random() * (userDocs.length - 1));
     for (let i = 0; i < randomNumOfComments; i++) {
       commentsArr.push({
-        body: faker.lorem.words(),
+        body: faker.lorem.sentences(),
         belongs_to: article._id,
         created_by: userDocs[randomUser]._id
       });

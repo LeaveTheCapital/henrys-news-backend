@@ -8,8 +8,8 @@ const mongoose = require("mongoose");
 const { testOrderFunction, createTestCommentData } = require("../utils");
 const { articleData, topicData, userData } = require("../seed/testData");
 
-describe("/api", () => {
-  // this.timeout(5000);
+describe("/api", function() {
+  this.timeout(6000);
   let articleDocs, topicDocs, movieDocs;
   beforeEach(() => {
     return seedDB(
@@ -40,6 +40,9 @@ describe("/api", () => {
         .get(`/api/topics/${topicDocs[0]._id}/articles`)
         .expect(200)
         .then(({ body }) => {
+          expect(body.articles[0].belongs_to).to.equal(
+            topicDocs[0]._id.toString()
+          );
           expect(body.articles.length).to.equal(2);
         });
     });
@@ -60,6 +63,19 @@ describe("/api", () => {
           );
         });
     });
+    it("ERROR HANDLING: bad post /topics/:topic_id/articles return a 400 and the message 'could not add article' ", () => {
+      return request
+        .post(`/api/topics/${topicDocs[0]._id}/articles`)
+        .send({
+          body: "this is the start of an extremely engaging test article",
+          belongs_to: topicDocs[0]._id,
+          created_by: userDocs[0]._id
+        })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).to.equal("could not add article");
+        });
+    });
   });
   describe("/users", () => {
     it("get /users/:username returns a 200 and a JSON object of the user", () => {
@@ -68,6 +84,7 @@ describe("/api", () => {
         .expect(200)
         .then(({ body }) => {
           expect(body.user.username).to.equal("butter_bridge");
+          expect(body.user._id).to.equal(userDocs[0]._id.toString());
         });
     });
   });
@@ -82,10 +99,23 @@ describe("/api", () => {
         })
         .expect(201)
         .then(({ body }) => {
-          console.log(body);
-          expect(body.comment.body).to.equal(
+          expect(body.comment).to.equal(
             "this is the start of an extremely engaging test comment"
           );
+        });
+    });
+    it("ERROR HANDLING: bad post /articles/:article_id/comments return a 400 and the message 'could not add comment' ", () => {
+      return request
+        .post(`/api/articles/${articleDocs[0]._id}/comments`)
+        .send({
+          bodydfdafddsf:
+            "this is the start of an extremely engaging test comment",
+          belongs_to: articleDocs[0]._id,
+          created_by: userDocs[0]._id
+        })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).to.equal("could not add comment");
         });
     });
     it("get /articles returns a 200 and 4 articles", () => {
@@ -103,6 +133,7 @@ describe("/api", () => {
         .get(`/api/articles/${articleDocs[0]._id}`)
         .expect(200)
         .then(({ body }) => {
+          expect(body.article._id).to.equal(articleDocs[0]._id.toString());
           expect(body.article.body).to.equal(
             "I find this existence challenging"
           );
@@ -113,6 +144,9 @@ describe("/api", () => {
         .get(`/api/articles/${articleDocs[0]._id}/comments`)
         .expect(200)
         .then(({ body }) => {
+          expect(body.comments[0].belongs_to).to.equal(
+            articleDocs[0]._id.toString()
+          );
           expect(body.comments.length).to.equal(2);
         });
     });
@@ -121,6 +155,7 @@ describe("/api", () => {
         .put(`/api/articles/${articleDocs[0]._id}?vote=up`)
         .expect(200)
         .then(({ body }) => {
+          expect(body.article._id).to.equal(articleDocs[0]._id.toString());
           expect(body.article.votes).to.equal(1);
         });
     });
@@ -129,15 +164,27 @@ describe("/api", () => {
         .put(`/api/articles/${articleDocs[0]._id}?vote=down`)
         .expect(200)
         .then(({ body }) => {
+          expect(body.article._id).to.equal(articleDocs[0]._id.toString());
           expect(body.article.votes).to.equal(-1);
         });
     });
-    it("PUT /api/articles/:article_id with any other query leave the vote count alone", () => {
+    // it("PUT /api/articles/:article_id with any other query leave the vote count alone", () => {
+    //   return request
+    //     .put(`/api/articles/${articleDocs[0]._id}?vote=asdf`)
+    //     .expect(200)
+    //     .then(({ body }) => {
+    //       expect(body.article._id).to.equal(articleDocs[0]._id.toString());
+    //       expect(body.article.votes).to.equal(0);
+    //     });
+    // });
+    it("ERROR HANDLING: bad PUT /api/articles/:article_id with invalid query will return a 400 and leave the vote count alone", () => {
       return request
         .put(`/api/articles/${articleDocs[0]._id}?vote=asdf`)
-        .expect(200)
+        .expect(400)
         .then(({ body }) => {
-          expect(body.article.votes).to.equal(0);
+          expect(body.message).to.equal(
+            "invalid query. could not update votes"
+          );
         });
     });
   });
@@ -147,6 +194,7 @@ describe("/api", () => {
         .put(`/api/comments/${commentDocs[0]._id}?vote=up`)
         .expect(200)
         .then(({ body }) => {
+          expect(body.comment._id).to.equal(commentDocs[0]._id.toString());
           expect(body.comment.votes).to.equal(1);
         });
     });
@@ -155,15 +203,28 @@ describe("/api", () => {
         .put(`/api/comments/${commentDocs[0]._id}?vote=down`)
         .expect(200)
         .then(({ body }) => {
+          expect(body.comment._id).to.equal(commentDocs[0]._id.toString());
           expect(body.comment.votes).to.equal(-1);
         });
     });
-    it("PUT /api/comments/:comment_id with any other query leaves the vote count alone", () => {
+    // it("PUT /api/comments/:comment_id with any other query leaves the vote count alone", () => {
+    //   return request
+    //     .put(`/api/comments/${commentDocs[0]._id}?vote=asdf`)
+    //     .expect(200)
+    //     .then(({ body }) => {
+    //       expect(body.comment._id).to.equal(commentDocs[0]._id.toString());
+    //       expect(body.comment.votes).to.equal(0);
+    //     });
+    // });
+    it("ERROR HANDLING: bad PUT /api/comments/:comment_id returns a 400 and an error message", () => {
       return request
         .put(`/api/comments/${commentDocs[0]._id}?vote=asdf`)
-        .expect(200)
+        .expect(400)
         .then(({ body }) => {
-          expect(body.comment.votes).to.equal(0);
+          // expect(body.comment._id).to.equal(commentDocs[0]._id.toString());
+          expect(body.message).to.equal(
+            "invalid query. could not update votes"
+          );
         });
     });
     it("DELETE /api/comments/:comment_id returns a 200, the id and a confirmation", () => {
@@ -171,7 +232,7 @@ describe("/api", () => {
         .delete(`/api/comments/${commentDocs[0]._id}`)
         .expect(200)
         .then(({ body }) => {
-          console.log(body);
+          expect(body.id).to.equal(commentDocs[0]._id.toString());
           expect(body.message).to.equal("comment deleted");
         });
     });

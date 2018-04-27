@@ -17,9 +17,17 @@ app.use("/*", (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  if (err.status === 404) res.status(404).send({ message: err.message });
-  else if (err.status === 400) res.status(400).send({ message: err.message });
-  else res.status(500).send({ message: err.message });
+  if (err.status === 404)
+    res
+      .status(404)
+      .send({ status: 404, message: err.message || "route not found" });
+  else if (err.status === 400)
+    res
+      .status(400)
+      .send({ status: 400, message: err.message || "bad request" });
+  else if (err.status === 204)
+    res.status(204).send({ status: 404, message: err.message || "no content" });
+  else res.status(500).send({ status: 500, message: "internal server error" });
 });
 
 function logRequest(req, res, next) {

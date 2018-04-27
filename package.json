@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha spec/",
+    "start": "node listen.js",
     "dev": "nodemon listen.js",
-    "seed:dev": "node seed/dev.seed.js"
+    "seed:dev": "node seed/dev.seed.js",
+    "seed:prod": "NODE_ENV=production node seed/dev.seed.js"
   },
   "author": "",
   "license": "ISC",

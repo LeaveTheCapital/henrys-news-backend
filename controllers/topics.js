@@ -17,9 +17,16 @@ exports.addArticleByTopicID = (req, res, next) => {
   const id = req.params.topic_id;
   new Article(req.body)
     .save()
-    .then(article => res.status(201).send({ article }))
+    .then(article =>
+      res.status(201).send({
+        article: {
+          title: article.title,
+          body: article.body
+        }
+      })
+    )
     .catch(err => {
-      console.log(err);
-      return next(err);
+      // console.log(err);
+      return next({ status: 400, message: "could not add article" });
     });
 };
