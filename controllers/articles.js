@@ -27,6 +27,8 @@ exports.getAllArticles = (req, res, next) => {
 exports.getArticleById = (req, res, next) => {
   const id = req.params.article_id;
   Article.findById(id)
+    .populate({ path: "created_by", select: "username name avatar_url" })
+    .populate({ path: "belongs_to", select: "slug" })
     .then(article => res.send({ article }))
     .catch(err => {
       return next(err);
