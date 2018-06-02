@@ -1,6 +1,6 @@
 # HENRYS NEWS - A UNIQUE TWIST ON THE NORTHCODERS NEWS API
 
-I Have created a restful API based on the Norchoders News Api (which can be viewed here http://northcoders-news-api.herokuapp.com/). Using a MongoDB database hosted with mLab, my functioning API is hosted at https://henrys-news.herokuapp.com/api/
+I have created a restful API based on the Norchoders News Api (which can be viewed here http://northcoders-news-api.herokuapp.com/). Using a MongoDB database hosted with mLab, my functioning API is hosted at https://henrys-news.herokuapp.com/api/
 The main goals for this project were to get to grips with Mongo and Mongoose, learn to deploy a project into production, practice complex Promise chains and use throrough TDD throughout including for error handling.
 
 ## Getting Started
@@ -9,7 +9,7 @@ These instructions will get you a copy of the API up and running on your local m
 
 ### Prerequisites
 
-You will need an understanding of core JavaScript as well as Mongo and Mongoose. You will need a development environment on your machine and potentially some command line skills.
+You will need an understanding of JavaScript, Mongo and Mongoose.
 
 ### Installing
 
@@ -78,7 +78,7 @@ For the versions available, see the [tags on this repository](https://github.com
 
 ## Authors
 
-* **Henry Withers** - _Northcoder Student_ - [GitHub](https://github.com/LeaveTheCapital)
+* **Henry Withers** - _Northcoders Student_ - [GitHub](https://github.com/LeaveTheCapital)
 
 ## Acknowledgments
 
